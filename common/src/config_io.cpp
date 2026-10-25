@@ -20,8 +20,7 @@ namespace common {
     return particles;
   }
 
-  std::vector<particle> load_particles(std::filesystem::path const & path,
-                                       enclosure const & box) {
+  std::vector<particle> load_particles(std::filesystem::path const & path, enclosure const & box) {
     std::ifstream input{path};
     if (not input) {
       throw std::runtime_error{std::format("Cannot open input file: {}", path.string())};
@@ -35,8 +34,8 @@ namespace common {
   }
 
   void write_particle(std::ostream & output, particle const & p) {
-    output << std::format("{}: {:.3f} {:.3f} {:.3f} {:.3f} {:.3f} {:.3f}\n", p.id, p.mass,
-                          p.radius, p.position.x, p.position.y, p.velocity.x, p.velocity.y);
+    output << std::format("{}: {:.3f} {:.3f} {:.3f} {:.3f} {:.3f} {:.3f}\n", p.id, p.mass, p.radius,
+                          p.position.x, p.position.y, p.velocity.x, p.velocity.y);
   }
 
 }  // namespace common

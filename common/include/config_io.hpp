@@ -14,8 +14,7 @@ namespace common {
 
   /// Reads objects until end of input, skipping non-conforming lines and invalid objects.
   /// Valid objects get consecutive identifiers starting at 0.
-  [[nodiscard]] std::vector<particle> read_particles(std::istream & input,
-                                                     enclosure const & box);
+  [[nodiscard]] std::vector<particle> read_particles(std::istream & input, enclosure const & box);
 
   /// Same as read_particles on the file at path. Throws std::runtime_error if it cannot be
   /// opened.

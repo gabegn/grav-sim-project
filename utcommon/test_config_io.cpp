@@ -14,17 +14,16 @@ namespace {
 }  // namespace
 
 TEST(test_config_io, read_particles_assigns_consecutive_ids_to_valid_objects) {
-  std::istringstream input{
-      "10 2 30 40 1 1\n"
-      "not a particle\n"
-      "-5 2 30 40 1 1\n"
-      "20 3 60 20 -1 0\n"};
+  std::istringstream input{"10 2 30 40 1 1\n"
+                           "not a particle\n"
+                           "-5 2 30 40 1 1\n"
+                           "20 3 60 20 -1 0\n"};
   auto const particles = common::read_particles(input, box);
   ASSERT_EQ(particles.size(), 2U);
-  EXPECT_EQ(particles[0].id, 0U);
-  EXPECT_EQ(particles[0].mass, 10.0);
-  EXPECT_EQ(particles[1].id, 1U);
-  EXPECT_EQ(particles[1].mass, 20.0);
+  EXPECT_EQ(particles.at(0).id, 0U);
+  EXPECT_EQ(particles.at(0).mass, 10.0);
+  EXPECT_EQ(particles.at(1).id, 1U);
+  EXPECT_EQ(particles.at(1).mass, 20.0);
 }
 
 TEST(test_config_io, read_particles_skips_objects_outside_enclosure) {
@@ -62,7 +61,7 @@ TEST(test_config_io, load_particles_reads_file) {
   auto const particles = common::load_particles(path, box);
   std::filesystem::remove(path);
   ASSERT_EQ(particles.size(), 2U);
-  EXPECT_EQ(particles[1].id, 1U);
+  EXPECT_EQ(particles.at(1).id, 1U);
 }
 
 TEST(test_config_io, write_header) {
@@ -73,20 +72,24 @@ TEST(test_config_io, write_header) {
 
 TEST(test_config_io, write_particle) {
   std::ostringstream output;
-  common::write_particle(output, {.id       = 3,
-                                  .mass     = 3.4664,
-                                  .radius   = 0.2449,
-                                  .position = {726.2474, 179.0306},
-                                  .velocity = {8.828, -2.7821}});
+  common::write_particle(output, {
+                                   .id       = 3,
+                                   .mass     = 3.4664,
+                                   .radius   = 0.2449,
+                                   .position = {726.2474, 179.0306},
+                                   .velocity = {   8.828,  -2.7821},
+  });
   EXPECT_EQ(output.str(), "3: 3.466 0.245 726.247 179.031 8.828 -2.782\n");
 }
 
 TEST(test_config_io, write_particle_rounds_to_three_decimals) {
   std::ostringstream output;
-  common::write_particle(output, {.id       = 0,
-                                  .mass     = 1.0,
-                                  .radius   = 1.0,
-                                  .position = {1.23456, 2.0},
-                                  .velocity = {0.0, -0.0004}});
+  common::write_particle(output, {
+                                   .id       = 0,
+                                   .mass     = 1.0,
+                                   .radius   = 1.0,
+                                   .position = {1.23456,     2.0},
+                                   .velocity = {    0.0, -0.0004},
+  });
   EXPECT_EQ(output.str(), "0: 1.000 1.000 1.235 2.000 0.000 -0.000\n");
 }
