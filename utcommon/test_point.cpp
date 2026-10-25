@@ -25,3 +25,41 @@ TEST(test_point, formatting) {
   EXPECT_EQ(actual, expected);
 }
 
+TEST(test_point, addition) {
+  common::point const sum = common::point{1.0, 2.0} + common::point{3.5, -4.0};
+  EXPECT_EQ(sum.x, 4.5);
+  EXPECT_EQ(sum.y, -2.0);
+}
+
+TEST(test_point, subtraction) {
+  common::point const diff = common::point{1.0, 2.0} - common::point{3.5, -4.0};
+  EXPECT_EQ(diff.x, -2.5);
+  EXPECT_EQ(diff.y, 6.0);
+}
+
+TEST(test_point, negation) {
+  common::point const neg = -common::point{1.5, -2.0};
+  EXPECT_EQ(neg.x, -1.5);
+  EXPECT_EQ(neg.y, 2.0);
+}
+
+TEST(test_point, scalar_multiplication) {
+  common::point const scaled = common::point{1.5, -2.0} * 2.0;
+  EXPECT_EQ(scaled.x, 3.0);
+  EXPECT_EQ(scaled.y, -4.0);
+}
+
+TEST(test_point, scalar_multiplication_by_zero) {
+  common::point const scaled = common::point{1.5, -2.0} * 0.0;
+  EXPECT_EQ(scaled.x, 0.0);
+  EXPECT_EQ(scaled.y, 0.0);
+}
+
+TEST(test_point, norm) {
+  EXPECT_DOUBLE_EQ(common::norm(common::point{3.0, 4.0}), 5.0);
+  EXPECT_DOUBLE_EQ(common::norm(common::point{-3.0, -4.0}), 5.0);
+}
+
+TEST(test_point, norm_of_zero_vector) {
+  EXPECT_EQ(common::norm(common::point{}), 0.0);
+}
