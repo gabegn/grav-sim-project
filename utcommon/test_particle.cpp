@@ -2,46 +2,60 @@
 
 #include <gtest/gtest.h>
 
+#include <string_view>
+
 namespace {
 
   common::particle make_particle(double mass, double radius, double x, double y) {
-    return {.id = 0, .mass = mass, .radius = radius, .position = {x, y}, .velocity = {}};
+    return {
+      .id       = 0,
+      .mass     = mass,
+      .radius   = radius,
+      .position = {  x,   y},
+      .velocity = {0.0, 0.0},
+    };
   }
 
   common::enclosure const box{.width = 100.0, .height = 50.0};
 
+  /// Parses a line that is expected to conform, reporting a test failure otherwise.
+  common::particle parse_conforming(std::string_view line) {
+    auto const parsed = common::parse_particle(line);
+    if (not parsed) {
+      ADD_FAILURE() << "line should conform: " << line;
+      return {};
+    }
+    return *parsed;
+  }
+
 }  // namespace
 
 TEST(test_particle, parse_valid_line) {
-  auto const p = common::parse_particle("10.5 2.0 30.0 40.0 -1.5 0.25");
-  ASSERT_TRUE(p.has_value());
-  EXPECT_EQ(p->id, 0U);
-  EXPECT_EQ(p->mass, 10.5);
-  EXPECT_EQ(p->radius, 2.0);
-  EXPECT_EQ(p->position.x, 30.0);
-  EXPECT_EQ(p->position.y, 40.0);
-  EXPECT_EQ(p->velocity.x, -1.5);
-  EXPECT_EQ(p->velocity.y, 0.25);
+  auto const p = parse_conforming("10.5 2.0 30.0 40.0 -1.5 0.25");
+  EXPECT_EQ(p.id, 0U);
+  EXPECT_EQ(p.mass, 10.5);
+  EXPECT_EQ(p.radius, 2.0);
+  EXPECT_EQ(p.position.x, 30.0);
+  EXPECT_EQ(p.position.y, 40.0);
+  EXPECT_EQ(p.velocity.x, -1.5);
+  EXPECT_EQ(p.velocity.y, 0.25);
 }
 
 TEST(test_particle, parse_extra_blanks_and_tabs) {
-  auto const p = common::parse_particle("  10\t2   30 40\t\t-1 1  ");
-  ASSERT_TRUE(p.has_value());
-  EXPECT_EQ(p->mass, 10.0);
-  EXPECT_EQ(p->velocity.y, 1.0);
+  auto const p = parse_conforming("  10\t2   30 40\t\t-1 1  ");
+  EXPECT_EQ(p.mass, 10.0);
+  EXPECT_EQ(p.velocity.y, 1.0);
 }
 
 TEST(test_particle, parse_windows_line_ending) {
-  auto const p = common::parse_particle("10 2 30 40 -1 1\r");
-  ASSERT_TRUE(p.has_value());
-  EXPECT_EQ(p->velocity.y, 1.0);
+  auto const p = parse_conforming("10 2 30 40 -1 1\r");
+  EXPECT_EQ(p.velocity.y, 1.0);
 }
 
 TEST(test_particle, parse_scientific_notation) {
-  auto const p = common::parse_particle("1e3 2.5E-1 3e1 4e1 0 0");
-  ASSERT_TRUE(p.has_value());
-  EXPECT_EQ(p->mass, 1000.0);
-  EXPECT_EQ(p->radius, 0.25);
+  auto const p = parse_conforming("1e3 2.5E-1 3e1 4e1 0 0");
+  EXPECT_EQ(p.mass, 1000.0);
+  EXPECT_EQ(p.radius, 0.25);
 }
 
 TEST(test_particle, parse_empty_line) {

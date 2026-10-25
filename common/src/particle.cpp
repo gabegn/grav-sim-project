@@ -11,7 +11,7 @@ namespace common {
 
   namespace {
 
-    constexpr std::string_view blanks          = " \t\r\v\f";
+    constexpr std::string_view blanks         = " \t\r\v\f";
     constexpr std::size_t fields_per_particle = 6;
 
     /// Removes and returns the next blank-separated token of line (empty when none is left).
@@ -49,16 +49,21 @@ namespace common {
     }
     if (not next_token(line).empty()) { return std::nullopt; }
     auto const [mass, radius, x, y, vx, vy] = values;
-    return particle{.id       = 0,
-                    .mass     = mass,
-                    .radius   = radius,
-                    .position = {.x = x, .y = y},
-                    .velocity = {.x = vx, .y = vy}};
+    return particle{
+      .id       = 0,
+      .mass     = mass,
+      .radius   = radius,
+      .position = { .x = x,  .y = y},
+      .velocity = {.x = vx, .y = vy},
+    };
   }
 
   bool is_valid(particle const & p, enclosure const & box) noexcept {
-    return p.mass > 0.0 and p.radius > 0.0 and p.position.x >= p.radius and
-           p.position.x <= box.width - p.radius and p.position.y >= p.radius and
+    return p.mass > 0.0 and
+           p.radius > 0.0 and
+           p.position.x >= p.radius and
+           p.position.x <= box.width - p.radius and
+           p.position.y >= p.radius and
            p.position.y <= box.height - p.radius;
   }
 

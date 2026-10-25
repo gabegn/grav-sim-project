@@ -95,11 +95,13 @@ namespace common {
   /// while id, radius and position are those of the absorber.
   [[nodiscard]] constexpr particle merge(particle const & absorber,
                                          particle const & absorbed) noexcept {
-    return {.id       = absorber.id,
-            .mass     = absorber.mass + absorbed.mass,
-            .radius   = absorber.radius,
-            .position = absorber.position,
-            .velocity = absorber.velocity + absorbed.velocity};
+    return {
+      .id       = absorber.id,
+      .mass     = absorber.mass + absorbed.mass,
+      .radius   = absorber.radius,
+      .position = absorber.position,
+      .velocity = absorber.velocity + absorbed.velocity,
+    };
   }
 
 }  // namespace common

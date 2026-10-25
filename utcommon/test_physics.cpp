@@ -143,7 +143,13 @@ TEST(test_physics, absorbs_equal_mass_and_radius_smaller_id) {
 }
 
 TEST(test_physics, key_of) {
-  common::particle const p{.id = 7, .mass = 3.0, .radius = 1.5, .position = {}, .velocity = {}};
+  common::particle const p{
+    .id       = 7,
+    .mass     = 3.0,
+    .radius   = 1.5,
+    .position = {0.0, 0.0},
+    .velocity = {0.0, 0.0},
+  };
   common::absorption_key const key = common::key_of(p);
   EXPECT_EQ(key.mass, 3.0);
   EXPECT_EQ(key.radius, 1.5);
@@ -152,9 +158,19 @@ TEST(test_physics, key_of) {
 
 TEST(test_physics, merge) {
   common::particle const absorber{
-    .id = 3, .mass = 5.0, .radius = 2.0, .position = {10.0, 20.0}, .velocity = {1.0, -1.0}};
+    .id       = 3,
+    .mass     = 5.0,
+    .radius   = 2.0,
+    .position = {10.0, 20.0},
+    .velocity = { 1.0, -1.0},
+  };
   common::particle const absorbed{
-    .id = 8, .mass = 1.5, .radius = 4.0, .position = {11.0, 21.0}, .velocity = {0.5, 2.0}};
+    .id       = 8,
+    .mass     = 1.5,
+    .radius   = 4.0,
+    .position = {11.0, 21.0},
+    .velocity = { 0.5,  2.0},
+  };
   common::particle const merged = common::merge(absorber, absorbed);
   EXPECT_EQ(merged.id, 3U);
   EXPECT_EQ(merged.mass, 6.5);
