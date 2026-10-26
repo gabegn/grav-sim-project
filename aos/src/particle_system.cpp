@@ -23,8 +23,9 @@ namespace aos {
       bodies_.push_back(b);
     }
   }
-  
-  // Continuously merges colliding particles until no overlaps remain
+
+  // Continuously merges colliding particles until no overlaps remain.
+  // After every merge the scan restarts from the lowest id, as the statement requires
   void particle_system::resolve_collisions() {
     while (merge_first_collision()) { }
   }
@@ -61,11 +62,13 @@ namespace aos {
 
   // Computes gravitational forces between all pairs and updates accelerations (a = F / m)
   void particle_system::compute_accelerations() {
+    // The acceleration field holds the sum of forces until the last loop divides it by the mass
     for (auto & b : bodies_) { b.acceleration = {0.0, 0.0}; }
     for (auto first = bodies_.begin(); first != bodies_.end(); ++first) {
       for (auto second = std::next(first); second != bodies_.end(); ++second) {
         common::point const force = common::gravitational_force(
             first->state.mass, second->state.mass, second->state.position - first->state.position);
+        // Each pair is computed only once: the second object gets the opposite force (F_ji = -F_ij)
         first->acceleration  = first->acceleration + force;
         second->acceleration = second->acceleration - force;
       }
@@ -79,12 +82,14 @@ namespace aos {
   void particle_system::move(double time_step) {
     for (auto & b : bodies_) {
       b.state.velocity = common::update_velocity(b.state.velocity, b.acceleration, time_step);
+      // Uses the new velocity (pending the instructor's answer on equation 5)
       b.state.position = common::update_position(b.state.position, b.state.velocity, time_step);
       common::rebound(b.state, box_);
     }
   }
 
-  // Finds and resolves the first pair collision by merging into the dominant body
+  // Finds the first colliding pair in id order and merges it into the absorber
+  // (larger mass, then larger radius, then smaller id). Returns false when no pair collides
   bool particle_system::merge_first_collision() {
     for (auto first = bodies_.begin(); first != bodies_.end(); ++first) {
       for (auto second = std::next(first); second != bodies_.end(); ++second) {
@@ -93,6 +98,7 @@ namespace aos {
         {
           continue;
         }
+        // The merged object takes the absorber's place, so the vector stays ordered by id
         if (common::absorbs(common::key_of(first->state), common::key_of(second->state))) {
           first->state = common::merge(first->state, second->state);
           bodies_.erase(second);

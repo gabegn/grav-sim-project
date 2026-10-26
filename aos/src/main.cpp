@@ -31,8 +31,8 @@ int main(int argc, char ** argv) try {
 
   return EXIT_SUCCESS;
 
-  // Error handling
 } catch (std::exception const & e) {
+  // Error handling: print the message and exit with a failure code
   std::cerr << "grav-aos: " << e.what() << '\n';
   return EXIT_FAILURE;
 
