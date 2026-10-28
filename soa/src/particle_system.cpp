@@ -168,7 +168,7 @@ namespace soa {
         common::particle const first  = particle(i);
         common::particle const second = particle(j);
         // The merged object takes the absorber's place, so the vectors stay ordered by id
-        if (common::absorbs(common::key_of(first), common::key_of(second))) {
+        if(common::absorbs(common::key_of(first), common::key_of(second))) {
           set(i, common::merge(first, second));
           remove(j);
         } else {
