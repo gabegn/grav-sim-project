@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Functional tests for grav-aos and grav-soa. They run the real executables:
 #  - success cases: init_config.txt and final_config.txt must match the expected files
-#    in ftest/<case>/ (worked out by hand, see ftest/README.md)
+#    in ftest/<case>/ (worked out by hand or provided by the instructor, see ftest/README.md)
 #  - error cases: the program must fail with the expected error message
 #  - AOS vs SOA: both versions must write identical files for a larger input
 #
@@ -118,6 +118,8 @@ check_success initial_collisions 1 100 50 1
 check_success collision_in_simulation 2 100 50 1
 check_success gravity 1 100 50 1
 check_success no_valid_objects 5 100 50 1
+# Official 1K use case: input and reference outputs provided by the instructor
+check_success official_1k 500 1000 1000 0.25
 
 echo "=== Error cases ==="
 valid_input="${root}/ftest/rebound/input.txt"

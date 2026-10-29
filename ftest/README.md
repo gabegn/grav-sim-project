@@ -1,7 +1,8 @@
 # Functional test data
 
 Each folder is one test case used by `ftest.sh`. The expected outputs were
-worked out by hand, not produced by the program.
+worked out by hand, not produced by the program, except for `official_1k`, whose
+input and reference outputs were provided by the instructor.
 
 | Folder | What it checks | Arguments |
 |---|---|---|
@@ -11,6 +12,7 @@ worked out by hand, not produced by the program.
 | `collision_in_simulation` | Two objects meet during the simulation and merge | `2 100 50 1` |
 | `gravity` | Gravitational acceleration between two heavy objects | `1 100 50 1` |
 | `no_valid_objects` | No valid object in the input | `5 100 50 1` |
+| `official_1k` | Official 1K use case (1000 objects): must match the instructor's reference outputs | `500 1000 1000 0.25` |
 | `aos_vs_soa` | 300 random objects: AOS and SOA must write identical files | `50 300 300 0.1` |
 
 Objects in the small cases have tiny masses and are far apart, so gravity is too weak
