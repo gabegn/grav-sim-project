@@ -52,11 +52,6 @@ namespace aos {
 
     /// Updates velocities and positions, then applies the rebound on the walls.
     void move(double time_step);
-
-    /// Finds the first colliding pair in id order and merges it.
-    /// Returns false when no pair collides.
-    bool merge_first_collision();
-
     common::enclosure box_;
     std::vector<body> bodies_;
   };

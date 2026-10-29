@@ -44,10 +44,25 @@ namespace soa {
     return {acc_x_.at(index), acc_y_.at(index)};
   }
 
-  // Continuously merges colliding particles until no overlaps remain.
-  // After every merge the scan restarts from the lowest id, as the statement requires
+  // Merges colliding particles until no overlaps remain, checking every pair once in id order.
+  // A merge never moves the surviving object or changes its radius, so pairs already checked
+  // cannot start colliding. Continuing the scan therefore finds the same pairs, in the same
+  // order, as restarting it from the lowest id after every merge (as the statement requires)
   void particle_system::resolve_collisions() {
-    while (merge_first_collision()) { }
+    std::size_t i = 0;
+    while (i < size()) {
+      bool first_absorbed = false;
+      std::size_t j       = i + 1;
+      while (j < size() and not first_absorbed) {
+        if (not common::collide(position(i), radius_.at(i), position(j), radius_.at(j))) {
+          ++j;
+        } else {
+          // After the merge, index j (or i, if it was absorbed) holds the next object to check
+          first_absorbed = merge_pair(i, j);
+        }
+      }
+      if (not first_absorbed) { ++i; }
+    }
   }
 
   // Advances the system by one time step: forces -> movement -> collisions
@@ -149,7 +164,7 @@ namespace soa {
     for (std::size_t i = 0; i < size(); ++i) {
       vel_x_.at(i) += acc_x_.at(i) * time_step;
       vel_y_.at(i) += acc_y_.at(i) * time_step;
-      // Uses the new velocity (pending the instructor's answer on equation 5)
+      // Equation 5 uses the velocity just updated by equation 4 (steps are applied in order)
       pos_x_.at(i) += vel_x_.at(i) * time_step;
       pos_y_.at(i) += vel_y_.at(i) * time_step;
       common::rebound(pos_x_.at(i), vel_x_.at(i), radius_.at(i), box_.width);
@@ -157,28 +172,20 @@ namespace soa {
     }
   }
 
-  // Finds the first colliding pair in id order and merges it into the absorber
-  // (larger mass, then larger radius, then smaller id). Returns false when no pair collides
-  bool particle_system::merge_first_collision() {
-    for (std::size_t i = 0; i < size(); ++i) {
-      for (std::size_t j = i + 1; j < size(); ++j) {
-        if (not common::collide(position(i), radius_.at(i), position(j), radius_.at(j))) {
-          continue;
-        }
-        common::particle const first  = particle(i);
-        common::particle const second = particle(j);
-        // The merged object takes the absorber's place, so the vectors stay ordered by id
-        if(common::absorbs(common::key_of(first), common::key_of(second))) {
-          set(i, common::merge(first, second));
-          remove(j);
-        } else {
-          set(j, common::merge(second, first));
-          remove(i);
-        }
-        return true;
-      }
+  // Merges the colliding objects i and j (i < j) into the absorber (larger mass, then larger
+  // radius, then smaller id) and removes the other one. Returns true when object i was absorbed
+  bool particle_system::merge_pair(std::size_t i, std::size_t j) {
+    common::particle const first  = particle(i);
+    common::particle const second = particle(j);
+    // The merged object takes the absorber's place, so the vectors stay ordered by id
+    if (common::absorbs(common::key_of(first), common::key_of(second))) {
+      set(i, common::merge(first, second));
+      remove(j);
+      return false;
     }
-    return false;
+    set(j, common::merge(second, first));
+    remove(i);
+    return true;
   }
 
 }  // namespace soa

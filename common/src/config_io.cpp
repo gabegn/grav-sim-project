@@ -10,10 +10,12 @@ namespace common {
   std::vector<particle> read_particles(std::istream & input, enclosure const & box) {
     std::vector<particle> particles;
     std::string line;
-    while (std::getline(input, line)) {
+    // Every line consumes an id, even when it is malformed or the object is invalid
+    // (instructor's answer on the course forum), so the id is the line number from 0
+    for (std::size_t id = 0; std::getline(input, line); ++id) {
       auto parsed = parse_particle(line);
       if (parsed and is_valid(*parsed, box)) {
-        parsed->id = particles.size();
+        parsed->id = id;
         particles.push_back(*parsed);
       }
     }

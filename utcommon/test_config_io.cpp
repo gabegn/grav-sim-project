@@ -13,7 +13,7 @@ namespace {
 
 }  // namespace
 
-TEST(test_config_io, read_particles_assigns_consecutive_ids_to_valid_objects) {
+TEST(test_config_io, read_particles_id_is_line_number) {
   std::istringstream input{"10 2 30 40 1 1\n"
                            "not a particle\n"
                            "-5 2 30 40 1 1\n"
@@ -22,8 +22,22 @@ TEST(test_config_io, read_particles_assigns_consecutive_ids_to_valid_objects) {
   ASSERT_EQ(particles.size(), 2U);
   EXPECT_EQ(particles.at(0).id, 0U);
   EXPECT_EQ(particles.at(0).mass, 10.0);
-  EXPECT_EQ(particles.at(1).id, 1U);
+  EXPECT_EQ(particles.at(1).id, 3U);
   EXPECT_EQ(particles.at(1).mass, 20.0);
+}
+
+TEST(test_config_io, read_particles_empty_line_uses_an_id) {
+  std::istringstream input{"\n10 2 30 40 1 1\n"};
+  auto const particles = common::read_particles(input, box);
+  ASSERT_EQ(particles.size(), 1U);
+  EXPECT_EQ(particles.at(0).id, 1U);
+}
+
+TEST(test_config_io, read_particles_invalid_object_uses_an_id) {
+  std::istringstream input{"10 2 1 40 1 1\n10 2 30 40 1 1\n"};
+  auto const particles = common::read_particles(input, box);
+  ASSERT_EQ(particles.size(), 1U);
+  EXPECT_EQ(particles.at(0).id, 1U);
 }
 
 TEST(test_config_io, read_particles_skips_objects_outside_enclosure) {

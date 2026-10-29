@@ -6,7 +6,7 @@ worked out by hand, not produced by the program.
 | Folder | What it checks | Arguments |
 |---|---|---|
 | `rebound` | One object crossing the right and bottom walls in the same iteration | `3 100 50 1` |
-| `invalid_input` | Junk lines, invalid objects, incomplete last line, consecutive ids | `2 100 50 0.5` |
+| `invalid_input` | Junk lines, invalid objects, incomplete last line; skipped lines still use up an id | `2 100 50 0.5` |
 | `initial_collisions` | Collisions before the simulation: heavier absorbs, chained merges, tie goes to the smaller id | `1 100 50 1` |
 | `collision_in_simulation` | Two objects meet during the simulation and merge | `2 100 50 1` |
 | `gravity` | Gravitational acceleration between two heavy objects | `1 100 50 1` |

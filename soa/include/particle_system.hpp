@@ -63,9 +63,9 @@ namespace soa {
     /// Updates velocities and positions, then applies the rebound on the walls.
     void move(double time_step);
 
-    /// Finds the first colliding pair in id order and merges it.
-    /// Returns false when no pair collides.
-    bool merge_first_collision();
+    /// Merges the colliding objects i and j (i < j) and removes the absorbed one.
+    /// Returns true when object i was absorbed.
+    bool merge_pair(std::size_t i, std::size_t j);
 
     common::enclosure box_;
     std::vector<std::size_t> id_;

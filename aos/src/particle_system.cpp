@@ -24,10 +24,34 @@ namespace aos {
     }
   }
 
-  // Continuously merges colliding particles until no overlaps remain.
-  // After every merge the scan restarts from the lowest id, as the statement requires
+  // Merges colliding particles until no overlaps remain, checking every pair once in id order.
+  // A merge never moves the surviving object or changes its radius, so pairs already checked
+  // cannot start colliding. Continuing the scan therefore finds the same pairs, in the same
+  // order, as restarting it from the lowest id after every merge (as the statement requires).
+  // The merged object takes the absorber's place, so the vector stays ordered by id
   void particle_system::resolve_collisions() {
-    while (merge_first_collision()) { }
+    auto first = bodies_.begin();
+    while (first != bodies_.end()) {
+      bool first_absorbed = false;
+      auto second         = std::next(first);
+      while (second != bodies_.end() and not first_absorbed) {
+        if (not common::collide(first->state.position, first->state.radius, second->state.position,
+                                second->state.radius))
+        {
+          ++second;
+        } else if (common::absorbs(common::key_of(first->state), common::key_of(second->state))) {
+          // first absorbs second: keep checking first against the objects after second
+          first->state = common::merge(first->state, second->state);
+          second       = bodies_.erase(second);
+        } else {
+          // second absorbs first: first disappears and the scan goes on with the next object
+          second->state  = common::merge(second->state, first->state);
+          first          = bodies_.erase(first);
+          first_absorbed = true;
+        }
+      }
+      if (not first_absorbed) { ++first; }
+    }
   }
 
   // Advances the system by one time step: forces -> movement -> collisions
@@ -82,34 +106,10 @@ namespace aos {
   void particle_system::move(double time_step) {
     for (auto & b : bodies_) {
       b.state.velocity = common::update_velocity(b.state.velocity, b.acceleration, time_step);
-      // Uses the new velocity (pending the instructor's answer on equation 5)
+      // Equation 5 uses the velocity just updated by equation 4 (steps are applied in order)
       b.state.position = common::update_position(b.state.position, b.state.velocity, time_step);
       common::rebound(b.state, box_);
     }
-  }
-
-  // Finds the first colliding pair in id order and merges it into the absorber
-  // (larger mass, then larger radius, then smaller id). Returns false when no pair collides
-  bool particle_system::merge_first_collision() {
-    for (auto first = bodies_.begin(); first != bodies_.end(); ++first) {
-      for (auto second = std::next(first); second != bodies_.end(); ++second) {
-        if (not common::collide(first->state.position, first->state.radius, second->state.position,
-                                second->state.radius))
-        {
-          continue;
-        }
-        // The merged object takes the absorber's place, so the vector stays ordered by id
-        if (common::absorbs(common::key_of(first->state), common::key_of(second->state))) {
-          first->state = common::merge(first->state, second->state);
-          bodies_.erase(second);
-        } else {
-          second->state = common::merge(second->state, first->state);
-          bodies_.erase(first);
-        }
-        return true;
-      }
-    }
-    return false;
   }
 
 }  // namespace aos
