@@ -48,7 +48,7 @@ namespace common {
 }  // namespace common
 
 template <> struct std::formatter<common::point> : public std::formatter<std::string_view> {
-  auto format(common::point const & p, std::format_context & ctx) const{
+  auto format(common::point const & p, std::format_context & ctx) const {
     std::string const text = std::format("{} {}", p.x, p.y);
     return std::formatter<std::string_view>::format(text, ctx);
   }

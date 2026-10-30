@@ -43,9 +43,7 @@ namespace common {
   }  // namespace
 
   program_arguments::program_arguments(std::vector<std::string> const & args) {
-    if (args.empty()) {
-      throw std::invalid_argument{"no arguments provided"};
-    }
+    if (args.empty()) { throw std::invalid_argument{"no arguments provided"}; }
     program_name_ = std::filesystem::path(args.at(0)).stem().string();
     if (args.size() != 5) {
       auto msg = std::format("{}: invoked with {} arguments", program_name_, args.size() - 1);

@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 TEST(test_progargs, zero_arguments) {
-  std::vector<std::string> const args {};
+  std::vector<std::string> const args{};
   EXPECT_THROW(common::program_arguments{args}, std::invalid_argument);
 }
 

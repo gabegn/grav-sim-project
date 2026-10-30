@@ -21,7 +21,7 @@ TEST(test_point, extraction_operator) {
 TEST(test_point, formatting) {
   common::point p{3.5, 4.5};
   std::string const expected = "3.5 4.5";
-  std::string const actual = std::format("{}", p);
+  std::string const actual   = std::format("{}", p);
   EXPECT_EQ(actual, expected);
 }
 

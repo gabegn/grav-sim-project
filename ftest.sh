@@ -7,12 +7,19 @@
 #
 # Usage: ./ftest.sh                   builds with the default preset, then runs the tests
 #        BUILD_DIR=<dir> ./ftest.sh   uses the executables already built in <dir>
+#        (set CXX to choose another compiler; default: g++-15 when installed)
 set -uo pipefail
 
 cd "$(dirname "$0")"
 root=$(pwd)
 
 if [[ -z "${BUILD_DIR:-}" ]]; then
+  # The project is compiled with g++-15 (C++23). Use it unless another compiler is requested;
+  # on macOS, Homebrew's g++ also needs the SDK path to link
+  if [[ -z "${CXX:-}" ]] && command -v g++-15 > /dev/null; then
+    export CXX=g++-15
+    if [[ "$(uname)" == "Darwin" ]]; then export SDKROOT="${SDKROOT:-$(xcrun --show-sdk-path)}"; fi
+  fi
   cmake --preset default || exit 1
   cmake --build --preset release || exit 1
   BUILD_DIR="out/build/default"
